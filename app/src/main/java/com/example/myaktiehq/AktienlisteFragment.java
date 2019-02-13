@@ -16,9 +16,27 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 public class AktienlisteFragment extends Fragment {
 
@@ -96,20 +114,57 @@ public class AktienlisteFragment extends Fragment {
 
         @Override
         protected String[] doInBackground(String... strings) {
-            String[] ergebnisArray = new String[20];
-            for(int i=0;i<20;i++){
-                ergebnisArray[i]= strings[0]+"_"+(i+1);
-
-                if(i%5 == 4){
-                    publishProgress(i+1,20);
-                }
-                try {
-                    Thread.sleep(600);
-                } catch (InterruptedException e) {
-                    Log.e(TAG, "doInBackground: Error",e );
-                }
+            if(strings.length==0){
+                return null;
             }
-            return ergebnisArray;
+            final String URL_PARAMETER = "http://www.programmierenlernenhq.de/tools/query.php";
+            String symbols = "DAI.DE,BMW.DE";
+
+            String anfrageString = URL_PARAMETER + "?s=" + symbols;
+            Log.d(TAG, "doInBackground: " +anfrageString);
+
+            HttpURLConnection httpURLConnection = null;
+            BufferedReader bufferedReader = null;
+
+            String aktiendatenXmlString = "";
+
+            try{
+                URL url = new URL(anfrageString);
+                httpURLConnection=(HttpURLConnection)url.openConnection();
+                InputStream inputStream = httpURLConnection.getInputStream();
+                if(inputStream == null){
+                    return null;
+                }
+                bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                String line;
+
+                while((line=bufferedReader.readLine())!=null){
+                    aktiendatenXmlString += line + "\n";
+                }
+                if(aktiendatenXmlString.length()== 0){
+                    return null;
+                }
+                Log.d(TAG, "doInBackground: " + aktiendatenXmlString);
+                publishProgress(1,1);
+
+            }catch (IOException ioe){
+                Log.e(TAG, "doInBackground: Error",ioe );
+                return null;
+
+            }finally {
+                if(httpURLConnection!=null)
+                    httpURLConnection.disconnect();
+                if(bufferedReader!=null){
+                    try {
+                        bufferedReader.close();
+                    } catch (IOException e) {
+                        Log.d(TAG, "doInBackground: Error");
+                    }
+                }
+
+            }
+
+            return leseXmlAktiendatenAus(aktiendatenXmlString);
         }
 
         @Override
@@ -131,6 +186,57 @@ public class AktienlisteFragment extends Fragment {
         @Override
         protected void onProgressUpdate(Integer... values) {
             Toast.makeText(getActivity(), values[0] + " von " + values[1] + " geladen", Toast.LENGTH_SHORT).show();
+        }
+
+        private String[] leseXmlAktiendatenAus(String xmlString){
+            Document doc ;
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            try {
+                DocumentBuilder db = dbf.newDocumentBuilder();
+                InputSource is = new InputSource();
+                is.setCharacterStream(new StringReader(xmlString));
+                doc = db.parse(is);
+            } catch (ParserConfigurationException e) {
+                Log.e(TAG, "leseXmlAktiendatenAus: Error",e );
+                return null;
+            } catch (SAXException e) {
+                Log.e(TAG, "leseXmlAktiendatenAus: Error",e );
+                return null;
+            } catch (IOException e) {
+                Log.e(TAG, "leseXmlAktiendatenAus: Error",e );
+                return null;
+            }
+            Element xmlAktiendaten = doc.getDocumentElement();
+            NodeList aktienListe = xmlAktiendaten.getElementsByTagName("row");
+
+            int anzahlAktien = aktienListe.getLength();
+            int anzahlAktienParameter = aktienListe.item(0).getChildNodes().getLength();
+
+            String[] ausgabeArray = new String[anzahlAktien];
+            String[][] alleAktienDatenArray = new String[anzahlAktien][anzahlAktienParameter];
+
+            Node aktienParameter;
+            String aktienParameterWert;
+
+            for(int i=0;i<anzahlAktien;i++){
+                NodeList aktienParameterListe = aktienListe.item(i).getChildNodes();
+                for(int j=0;j<anzahlAktienParameter;j++){
+                    aktienParameter = aktienParameterListe.item(j);
+                    aktienParameterWert = aktienParameter.getFirstChild().getNodeValue();
+                    alleAktienDatenArray[i][j]=aktienParameterWert;
+                }
+                ausgabeArray[i]  = alleAktienDatenArray[i][0];                // symbol
+                ausgabeArray[i] += ": " + alleAktienDatenArray[i][4];         // price
+                ausgabeArray[i] += " " + alleAktienDatenArray[i][2];          // currency
+                ausgabeArray[i] += " (" + alleAktienDatenArray[i][8] + ")";   // percent
+                ausgabeArray[i] += " - [" + alleAktienDatenArray[i][1] + "]"; // name
+
+                Log.v(TAG,"XML Output:" + ausgabeArray[i]);
+            }
+
+
+
+            return ausgabeArray;
         }
     }
 }
