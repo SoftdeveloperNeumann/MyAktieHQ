@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <EditTextPreference
         android:defaultValue="@string/preference_aktienliste_default"
@@ -9,8 +10,8 @@
         android:title="@string/preference_aktienliste_titel" />
 
     <CheckBoxPreference
-        android:title="@string/preference_indizemodus_titel"
+        android:defaultValue="false"
         android:key="@string/preference_indizemodus_key"
         android:summary="@string/preference_indizemodus_summary"
-        android:defaultValue="false"/>
+        android:title="@string/preference_indizemodus_titel" />
 </PreferenceScreen>
