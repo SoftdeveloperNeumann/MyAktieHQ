@@ -1,8 +1,10 @@
 package com.example.myaktiehq;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -113,7 +115,22 @@ public class AktienlisteFragment extends Fragment {
         switch (item.getItemId()){
             case R.id.action_daten_aktualisieren:
                 HoleDatenTask holeDatenTask=new HoleDatenTask();
-                holeDatenTask.execute("Aktie");
+
+                SharedPreferences sPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                String prefAktienlisteKey = getString(R.string.preference_aktienliste_key);
+                String prefAktienlisteDefault = getString(R.string.preference_aktienliste_default);
+                String aktienliste = sPrefs.getString(prefAktienlisteKey,prefAktienlisteDefault);
+
+                String prefIndizemodusKey = getString(R.string.preference_indizemodus_key);
+                Boolean indizemodus = sPrefs.getBoolean(prefIndizemodusKey,false);
+                if(indizemodus){
+                    String indizeListe = "^GDAXI,^TECDAX,^MDAXI,^SDAXI,^GSPC,^N225,^HSI,XAGUSD=X,XAUUSD=X";
+                    holeDatenTask.execute(indizeListe);
+                }else{
+                    holeDatenTask.execute(aktienliste);
+                }
+
+
                 Toast.makeText(getContext(), "Daten werden abgefragt", Toast.LENGTH_SHORT).show();
                 return true;
         }
@@ -130,7 +147,7 @@ public class AktienlisteFragment extends Fragment {
                 return null;
             }
             final String URL_PARAMETER = "http://www.programmierenlernenhq.de/tools/query.php";
-            String symbols = "DAI.DE,BMW.DE";
+            String symbols = strings[0];
 
             String anfrageString = URL_PARAMETER + "?s=" + symbols;
             Log.d(TAG, "doInBackground: " +anfrageString);

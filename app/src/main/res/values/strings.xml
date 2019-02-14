@@ -1,6 +1,17 @@
 <resources>
     <string name="app_name">MyAktieHQ</string>
+
     <string name="action_settings">Settings</string>
     <string name="action_daten_aktualisieren">Aktualisieren</string>
+
     <string name="titel_activity_aktiendetail">Aktiendetails</string>
+    <string name="titel_activity_einstellungen">Einstellungen</string>
+
+    <string name="preference_aktienliste_default">BMW.DE,DAI.DE,VOW3.DE,SAP.DE,^GDAXI</string>
+    <string name="preference_aktienliste_key">aktienliste</string>
+    <string name="preference_aktienliste_titel">Liste der Finanzinstrumente</string>
+    <string name="preference_indizemodus_titel">Marktübersicht</string>
+    <string name="preference_indizemodus_key">indizemodus</string>
+    <string name="preference_indizemodus_summary">Eine Indizeliste wird anstelle der Aktienliste angezeigt.</string>
+
 </resources>
