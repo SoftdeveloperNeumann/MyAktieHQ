@@ -7,4 +7,14 @@
         android:orderInCategory="100"
         app:showAsAction="never"/>
 
+    <item android:id="@+id/action_starte_browser"
+        android:title="@string/action_starte_browser"
+        android:orderInCategory="50"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/action_teile_aktiendaten"
+        android:title="@string/action_teile_aktiendaten"
+        app:showAsAction="ifRoom"
+        app:actionProviderClass="android.support.v7.widget.ShareActionProvider"/>
+
 </menu>

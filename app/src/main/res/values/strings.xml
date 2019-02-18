@@ -3,6 +3,8 @@
 
     <string name="action_settings">Settings</string>
     <string name="action_daten_aktualisieren">Aktualisieren</string>
+    <string name="action_starte_browser">Mehr Infos anzeigen</string>
+    <string name="action_teile_aktiendaten">Teilen</string>
 
     <string name="titel_activity_aktiendetail">Aktiendetails</string>
     <string name="titel_activity_einstellungen">Einstellungen</string>
