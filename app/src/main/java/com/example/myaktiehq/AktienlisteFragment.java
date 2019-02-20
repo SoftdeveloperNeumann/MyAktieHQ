@@ -37,7 +37,6 @@ import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -63,36 +62,30 @@ public class AktienlisteFragment extends Fragment {
         Log.d(TAG, "onCreateView: FragmentView erstellt");
 
 
-        String[] aktienlisteArray = {
-                "Adidas - Kurs: 73,45 €",
-                "Allianz - Kurs: 145,12 €",
-                "BASF - Kurs: 84,27 €",
-                "Bayer - Kurs: 128,60 €",
-                "Beiersdorf - Kurs: 80,55 €",
-                "BMW St. - Kurs: 104,11 €",
-                "Commerzbank - Kurs: 12,47 €",
-                "Continental - Kurs: 209,94 €",
-                "Daimler - Kurs: 84,33 €"
-        };
+//        String[] aktienlisteArray = {
+//                "Adidas - Kurs: 73,45 €",
+//                "Allianz - Kurs: 145,12 €",
+//                "BASF - Kurs: 84,27 €",
+//                "Bayer - Kurs: 128,60 €",
+//                "Beiersdorf - Kurs: 80,55 €",
+//                "BMW St. - Kurs: 104,11 €",
+//                "Commerzbank - Kurs: 12,47 €",
+//                "Continental - Kurs: 209,94 €",
+//                "Daimler - Kurs: 84,33 €"
+//        };
 
         if (savedInstanceState != null) {
             aktienListe = savedInstanceState.getStringArrayList(STATE_DATA);
-
+            createAdapter();
             Log.d(TAG, "onCreateView: Fragment wieder hergestellt");
         }else{
-            aktienListe = new ArrayList<>(Arrays.asList(aktienlisteArray));
-
+            aktienListe = new ArrayList<>();
+            createAdapter();
+            aktualisiereDaten();
         }
 
 
 
-
-        mAktienListeAdapter = new ArrayAdapter<>(
-                getActivity(),
-                R.layout.list_item_aktienliste,
-                R.id.list_item_aktienliste_textview,
-                aktienListe
-        );
 
         View rootView = inflater.inflate(R.layout.fragment_aktienliste, container, false);
         ListView aktienlisteListView = rootView.findViewById(R.id.listview_aktienliste);
@@ -114,6 +107,15 @@ public class AktienlisteFragment extends Fragment {
 //        aktualisiereDaten();
         return rootView;
 
+    }
+
+    private void createAdapter() {
+        mAktienListeAdapter = new ArrayAdapter<>(
+                getActivity(),
+                R.layout.list_item_aktienliste,
+                R.id.list_item_aktienliste_textview,
+                aktienListe
+        );
     }
 
     @Override
